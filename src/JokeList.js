@@ -1,6 +1,8 @@
 import React from 'react';
 import './JokeList.css';
 import axios from 'axios';
+import uuid from 'uuid/v4';
+import Joke from './Joke';
 
 class JokeList extends React.Component {
   static defaultProps = {
@@ -13,6 +15,8 @@ class JokeList extends React.Component {
     this.state = {
       jokes: [],
     };
+
+    this.handleVote = this.handleVote.bind(this);
   }
 
   async componentDidMount() {
@@ -26,14 +30,20 @@ class JokeList extends React.Component {
         },
       });
 
-      jokes.push(response.data.joke);
+      jokes.push({id: uuid(), text: response.data.joke, votes: 0});
     }
-
-    console.log(jokes);
 
     this.setState({
       jokes,
     });
+  }
+
+  handleVote(id, change) {
+    this.setState(st => ({
+      jokes: st.jokes.map(joke =>
+        joke.id === id ? {...joke, votes: joke.votes + change} : joke
+      ),
+    }));
   }
 
   render() {
@@ -51,7 +61,13 @@ class JokeList extends React.Component {
         </div>
         <div className='JokeList-jokes'>
           {this.state.jokes.map(joke => (
-            <div> {joke}</div>
+            <Joke
+              key={joke.id}
+              votes={joke.votes}
+              text={joke.text}
+              upvote={() => this.handleVote(joke.id, 1)}
+              downvote={() => this.handleVote(joke.id, -1)}
+            />
           ))}
         </div>
       </div>
