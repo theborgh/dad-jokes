@@ -13,13 +13,20 @@ class JokeList extends React.Component {
     super(props);
 
     this.state = {
-      jokes: [],
+      jokes: JSON.parse(window.localStorage.getItem('jokes') || '[]'),
     };
 
     this.handleVote = this.handleVote.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
-  async componentDidMount() {
+  componentDidMount() {
+    if (!this.state.jokes.length) {
+      this.getJokes();
+    }
+  }
+
+  async getJokes() {
     let jokes = [];
 
     // how to use defaultProps
@@ -33,17 +40,30 @@ class JokeList extends React.Component {
       jokes.push({id: uuid(), text: response.data.joke, votes: 0});
     }
 
-    this.setState({
-      jokes,
-    });
+    this.setState(
+      st => ({
+        jokes: [...st.jokes, ...jokes],
+      }),
+      () =>
+        window.localStorage.setItem('jokes', JSON.stringify(this.state.jokes))
+    );
+    window.localStorage.setItem('jokes', JSON.stringify(jokes));
+  }
+
+  handleClick() {
+    this.getJokes();
   }
 
   handleVote(id, change) {
-    this.setState(st => ({
-      jokes: st.jokes.map(joke =>
-        joke.id === id ? {...joke, votes: joke.votes + change} : joke
-      ),
-    }));
+    this.setState(
+      st => ({
+        jokes: st.jokes.map(joke =>
+          joke.id === id ? {...joke, votes: joke.votes + change} : joke
+        ),
+      }),
+      () =>
+        window.localStorage.setItem('jokes', JSON.stringify(this.state.jokes))
+    ); // runs AFTER the setState
   }
 
   render() {
@@ -57,7 +77,9 @@ class JokeList extends React.Component {
             src='https://assets.dryicons.com/uploads/icon/svg/8927/0eb14c71-38f2-433a-bfc8-23d9c99b3647.svg'
             alt=''
           />
-          <button className='JokeList-getmore'>New Jokes</button>
+          <button className='JokeList-getmore' onClick={this.handleClick}>
+            New Jokes
+          </button>
         </div>
         <div className='JokeList-jokes'>
           {this.state.jokes.map(joke => (
