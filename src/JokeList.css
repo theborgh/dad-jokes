@@ -19,7 +19,7 @@
   margin: 2rem;
   color: white;
   font-weight: 300;
-  letter-spacing: .6rem;
+  letter-spacing: 0.6rem;
 }
 
 .JokeList-title span {
@@ -38,4 +38,9 @@
   align-self: center;
   width: 70%;
   overflow: scroll;
+}
+
+.JokeList-spinner {
+  color: white;
+  text-align: center;
 }
