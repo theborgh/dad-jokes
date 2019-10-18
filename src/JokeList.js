@@ -55,7 +55,6 @@ class JokeList extends React.Component {
         () =>
           window.localStorage.setItem('jokes', JSON.stringify(this.state.jokes))
       );
-      window.localStorage.setItem('jokes', JSON.stringify(jokes));
     } catch (err) {
       alert(err);
       this.setState({loading: false});
@@ -101,7 +100,7 @@ class JokeList extends React.Component {
             alt=''
           />
           <button className='JokeList-getmore' onClick={this.handleClick}>
-            New Jokes
+            More Jokes!
           </button>
         </div>
         <div className='JokeList-jokes'>
