@@ -1,8 +1,8 @@
 import React from 'react';
-import './JokeList.css';
 import axios from 'axios';
 import uuid from 'uuid/v4';
 import Joke from './Joke';
+import './JokeList.css';
 
 class JokeList extends React.Component {
   static defaultProps = {
@@ -15,6 +15,7 @@ class JokeList extends React.Component {
     this.state = {
       jokes: JSON.parse(window.localStorage.getItem('jokes') || '[]'),
       loading: false,
+      firstLoad: true,
     };
 
     this.seenJokes = new Set(this.state.jokes.map(joke => joke.text));
@@ -25,17 +26,16 @@ class JokeList extends React.Component {
   }
 
   componentDidMount() {
-    if (!this.state.jokes.length) {
+    if (this.state.firstLoad) {
       this.getJokes();
     }
   }
 
   async getJokes() {
     try {
-      let jokes = [];
+      let newJokes = [];
 
-      // how to use defaultProps
-      while (jokes.length < this.props.numJokesToGet) {
+      while (newJokes.length < this.props.numJokesToGet) {
         const response = await axios.get('https://icanhazdadjoke.com/', {
           headers: {
             Accept: 'application/json',
@@ -44,14 +44,15 @@ class JokeList extends React.Component {
 
         let newJoke = response.data.joke;
         if (!this.seenJokes.has(newJoke)) {
-          jokes.push({id: uuid(), text: newJoke, votes: 0});
+          newJokes.push({id: uuid(), text: newJoke, votes: 0});
         }
       }
 
       this.setState(
         st => ({
-          jokes: [...st.jokes, ...jokes],
+          jokes: [...st.jokes, ...newJokes],
           loading: false,
+          firstLoad: false,
         }),
         () =>
           window.localStorage.setItem('jokes', JSON.stringify(this.state.jokes))
@@ -88,7 +89,7 @@ class JokeList extends React.Component {
       return (
         <div className='JokeList-spinner'>
           <i className='far fa-8x fa-laugh fa-spin'></i>
-          <h1 className='JokeList-title'>Loading...</h1>
+          <h1 className='JokeList-title'>Fetching Bad Jokes...</h1>
         </div>
       );
     }
@@ -114,15 +115,21 @@ class JokeList extends React.Component {
           </button>
         </div>
         <div className='JokeList-jokes'>
-          {jokes.map(joke => (
-            <Joke
-              key={joke.id}
-              votes={joke.votes}
-              text={joke.text}
-              upvote={() => this.handleVote(joke.id, 1)}
-              downvote={() => this.handleVote(joke.id, -1)}
-            />
-          ))}
+          {!this.state.firstLoad && !jokes.length ? (
+            <h1 className='JokeList-morejokesprompt'>
+              Click More Jokes! when you're mentally ready...
+            </h1>
+          ) : (
+            jokes.map(joke => (
+              <Joke
+                key={joke.id}
+                votes={joke.votes}
+                text={joke.text}
+                upvote={() => this.handleVote(joke.id, 1)}
+                downvote={() => this.handleVote(joke.id, -1)}
+              />
+            ))
+          )}
         </div>
       </div>
     );

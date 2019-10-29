@@ -29,6 +29,16 @@
   letter-spacing: 0;
 }
 
+.JokeList-title:hover span {
+  display: none;
+}
+
+.JokeList-title:hover::before {
+  content: 'Bad';
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
 .JokeList-sidebar img {
   width: 50%;
   border-radius: 50%;
@@ -94,4 +104,9 @@
 .JokeList-delete:hover {
   transform: translateY(-1px);
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+}
+
+.JokeList-morejokesprompt {
+  text-align: center;
+  margin-top: 5rem;
 }
