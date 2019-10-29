@@ -21,6 +21,7 @@ class JokeList extends React.Component {
 
     this.handleVote = this.handleVote.bind(this);
     this.handleClick = this.handleClick.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
   }
 
   componentDidMount() {
@@ -77,6 +78,11 @@ class JokeList extends React.Component {
     ); // runs AFTER the setState
   }
 
+  handleDelete() {
+    this.setState({jokes: []});
+    window.localStorage.clear();
+  }
+
   render() {
     if (this.state.loading) {
       return (
@@ -101,6 +107,10 @@ class JokeList extends React.Component {
           />
           <button className='JokeList-getmore' onClick={this.handleClick}>
             More Jokes!
+          </button>
+          <button className='JokeList-delete' onClick={this.handleDelete}>
+            These are all terrible!{' '}
+            <span className='Jokelist-delete-span'>DELETE!</span>
           </button>
         </div>
         <div className='JokeList-jokes'>
