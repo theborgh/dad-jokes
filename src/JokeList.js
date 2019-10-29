@@ -89,7 +89,7 @@ class JokeList extends React.Component {
       return (
         <div className='JokeList-spinner'>
           <i className='far fa-8x fa-laugh fa-spin'></i>
-          <h1 className='JokeList-title'>Fetching Bad Jokes...</h1>
+          <h1 className='JokeList-loading'>Fetching Bad Jokes...</h1>
         </div>
       );
     }
@@ -117,7 +117,7 @@ class JokeList extends React.Component {
         <div className='JokeList-jokes'>
           {!this.state.firstLoad && !jokes.length ? (
             <h1 className='JokeList-morejokesprompt'>
-              Click More Jokes! when you're mentally ready...
+              Click &lt;More Jokes!&gt; when you're mentally ready...
             </h1>
           ) : (
             jokes.map(joke => (

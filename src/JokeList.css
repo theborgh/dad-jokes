@@ -39,6 +39,14 @@
   letter-spacing: 0;
 }
 
+.JokeList-loading {
+  font-size: 4rem;
+  margin: 2rem;
+  color: white;
+  font-weight: 300;
+  letter-spacing: 0.6rem;
+}
+
 .JokeList-sidebar img {
   width: 50%;
   border-radius: 50%;
