@@ -1,8 +1,8 @@
 import React from 'react';
-import './JokeList.css';
 import axios from 'axios';
 import uuid from 'uuid/v4';
 import Joke from './Joke';
+import './JokeList.css';
 
 class JokeList extends React.Component {
   static defaultProps = {
@@ -15,26 +15,27 @@ class JokeList extends React.Component {
     this.state = {
       jokes: JSON.parse(window.localStorage.getItem('jokes') || '[]'),
       loading: false,
+      firstLoad: true,
     };
 
     this.seenJokes = new Set(this.state.jokes.map(joke => joke.text));
 
     this.handleVote = this.handleVote.bind(this);
     this.handleClick = this.handleClick.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
   }
 
   componentDidMount() {
-    if (!this.state.jokes.length) {
+    if (this.state.firstLoad) {
       this.getJokes();
     }
   }
 
   async getJokes() {
     try {
-      let jokes = [];
+      let newJokes = [];
 
-      // how to use defaultProps
-      while (jokes.length < this.props.numJokesToGet) {
+      while (newJokes.length < this.props.numJokesToGet) {
         const response = await axios.get('https://icanhazdadjoke.com/', {
           headers: {
             Accept: 'application/json',
@@ -43,14 +44,15 @@ class JokeList extends React.Component {
 
         let newJoke = response.data.joke;
         if (!this.seenJokes.has(newJoke)) {
-          jokes.push({id: uuid(), text: newJoke, votes: 0});
+          newJokes.push({id: uuid(), text: newJoke, votes: 0});
         }
       }
 
       this.setState(
         st => ({
-          jokes: [...st.jokes, ...jokes],
+          jokes: [...st.jokes, ...newJokes],
           loading: false,
+          firstLoad: false,
         }),
         () =>
           window.localStorage.setItem('jokes', JSON.stringify(this.state.jokes))
@@ -77,12 +79,17 @@ class JokeList extends React.Component {
     ); // runs AFTER the setState
   }
 
+  handleDelete() {
+    this.setState({jokes: []});
+    window.localStorage.clear();
+  }
+
   render() {
     if (this.state.loading) {
       return (
         <div className='JokeList-spinner'>
           <i className='far fa-8x fa-laugh fa-spin'></i>
-          <h1 className='JokeList-title'>Loading...</h1>
+          <h1 className='JokeList-loading'>Fetching Bad Jokes...</h1>
         </div>
       );
     }
@@ -102,17 +109,27 @@ class JokeList extends React.Component {
           <button className='JokeList-getmore' onClick={this.handleClick}>
             More Jokes!
           </button>
+          <button className='JokeList-delete' onClick={this.handleDelete}>
+            These are all terrible!{' '}
+            <span className='Jokelist-delete-span'>DELETE!</span>
+          </button>
         </div>
         <div className='JokeList-jokes'>
-          {jokes.map(joke => (
-            <Joke
-              key={joke.id}
-              votes={joke.votes}
-              text={joke.text}
-              upvote={() => this.handleVote(joke.id, 1)}
-              downvote={() => this.handleVote(joke.id, -1)}
-            />
-          ))}
+          {!this.state.firstLoad && !jokes.length ? (
+            <h1 className='JokeList-morejokesprompt'>
+              Click &lt;More Jokes!&gt; when you're mentally ready...
+            </h1>
+          ) : (
+            jokes.map(joke => (
+              <Joke
+                key={joke.id}
+                votes={joke.votes}
+                text={joke.text}
+                upvote={() => this.handleVote(joke.id, 1)}
+                downvote={() => this.handleVote(joke.id, -1)}
+              />
+            ))
+          )}
         </div>
       </div>
     );
