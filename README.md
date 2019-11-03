@@ -10,4 +10,4 @@ That's it! Enjoy some bad jokes!
 
 # Live demo
 
-You can find a live demo [here](https://stupefied-booth-d48ffe.netlify.com/).
+You can find a live demo [here](https://dadjokesapp.netlify.com/).
